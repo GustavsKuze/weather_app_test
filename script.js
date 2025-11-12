@@ -25,6 +25,38 @@ const weatherDescriptions = {
   99: "Thunderstorm with heavy hail"
 };
 
+// Autocomplete functionality
+const cityInput = document.getElementById("cityField");
+const citySuggestions = document.getElementById("citySuggestions");
+
+cityInput.addEventListener("input", async (e) => {
+  const query = e.target.value.trim();
+  
+  if (query.length < 2) {
+    citySuggestions.innerHTML = "";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=10&language=en`
+    );
+    const data = await response.json();
+    
+    citySuggestions.innerHTML = "";
+    
+    if (data.results) {
+      data.results.forEach((result) => {
+        const option = document.createElement("option");
+        option.value = `${result.name}, ${result.country}`;
+        citySuggestions.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching suggestions:", error);
+  }
+});
+
 document.getElementById("searchBtn").addEventListener("click", () => {
   const city = document.getElementById("cityField").value.trim();
   if (city) {
